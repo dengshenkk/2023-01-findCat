@@ -1,10 +1,10 @@
 <template>
   <div class="chessBoard-wrap">
-    <div class="tips"><span v-if="isWin">你赢了</span> 耗时: {{second}} 秒</div>
-    <div class="chessBoard">
-    <div v-for="row in board" class="chessBox">
-      <chess :data="row" :current="row.current" @click="handleClick(row)"/>
+    <div class="tips"><span v-if="isWin">你赢了 <span v-if="second< 10"> 但是你作弊了吧 - - </span></span> 耗时:
+      {{ second }} 秒
     </div>
+    <div class="chessBoard">
+      <chess v-for="(row, i) in board" :key="i" :current="row.current" :data="row" @click="handleClick(row)"/>
   </div>
   </div>
 </template>
@@ -19,7 +19,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-
+import confetti from "canvas-confetti";
 import {computed, ref, watchEffect} from "vue";
 
 import cat1 from "../assets/images/1.png";
@@ -55,9 +55,35 @@ let selectedArr: chess[] = []
 let timer: number | null = null
 let second = ref(0)
 
+function useConfetti(count: number) {
+  function randomInRange(min: number, max: number) {
+    return Math.random() * (max - min) + min;
+  }
+
+  function createConfetti() {
+    confetti({
+      angle: randomInRange(55, 125),
+      spread: randomInRange(50, 70),
+      particleCount: randomInRange(10, 100),
+      origin: {y: 0.5}
+    })
+  }
+
+  function putConfetti() {
+    while (count > 0) {
+      setTimeout(() => {
+        createConfetti()
+      }, 100 * count)
+      count--
+    }
+  }
+
+  return {putConfetti}
+}
+
 function startTime() {
   timer = setInterval(() => {
-    second.value ++
+    second.value++
   }, 1000)
 }
 function handleClick(row: chess) {
@@ -98,7 +124,6 @@ function clear(arr: chess[]) {
   })
 }
 
-console.log(catImages[1]);
 
 const data: chess[] = [
   {data: 1, current: 'front', url: ''},
@@ -126,13 +151,16 @@ const data: chess[] = [
 
 const board = ref<chess[]>(data)
 
+const {putConfetti} = useConfetti(10);
 const isWin = computed(() => {
- return board.value.every(item => item.current === BACK)
+  return board.value.every(item => item.current === BACK)
 })
+
 
 watchEffect(() => {
   // 赢了以后停止定时器
   if (isWin.value) {
+    putConfetti()
     clearInterval(timer as number)
   }
 })
@@ -149,11 +177,6 @@ watchEffect(() => {
   width: 600px;
   flex-wrap: wrap;
   background-image: url("../assets/images/background.png");
-  background-size: cover;
-
-  .chessBox {
-    width: 150px;
-    height: 150px;
-  }
+  background-size: contain;
 }
 </style>

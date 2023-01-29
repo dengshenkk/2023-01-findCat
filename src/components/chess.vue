@@ -1,6 +1,6 @@
 <template>
   <div class="chess" @click="handleClick" ref="chess">
-    <img class="front active" v-show="current === 'front'" alt="" src="https://via.placeholder.com/150?text=Hi"
+    <img v-show="current === 'front'" alt="" class="front active" src="https://via.placeholder.com/150?text=Vue"
          @click="isActive = 2">
     <img class="back active" v-show="current === 'back'" alt="" :src="data.url"
          @click="isActive = 1">
@@ -14,7 +14,7 @@ export default {
 </script>
 <script setup lang="ts">
 
-import {Prop, PropType, ref} from "vue";
+import {PropType, ref} from "vue";
 
 
 const props = defineProps({
@@ -40,10 +40,14 @@ function handleClick() {
   return emits('click', props.data.data)
 }
 
+
+
 </script>
 <style lang="scss" scoped>
 
 .chess {
+  width: 150px;
+  height: 150px;
   border: 1px solid #333;
   margin-right:-1px;
   margin-bottom:-1px;
