@@ -35,8 +35,10 @@ const emits = defineEmits(['click'])
 const isActive = ref(1)
 
 
-function handleClick() {
-  console.log('chess click');
+function handleClick(e: Event) {
+  if (!e.isTrusted) {
+    return alert('不可以作弊哦!')
+  }
   return emits('click', props.data.data)
 }
 
